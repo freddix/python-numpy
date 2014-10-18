@@ -2,18 +2,21 @@
 
 Summary:	Python numerical facilities
 Name:		python-%{module}
-Version:	1.6.2
-Release:	2
+Version:	1.9.0
+Release:	1
 Epoch:		1
 License:	BSD
 Group:		Libraries/Python
 Source0:	http://downloads.sourceforge.net/numpy/%{module}-%{version}.tar.gz
-# Source0-md5:	95ed6c9dcc94af1fc1642ea2a33c1bba
+# Source0-md5:	a93dfc447f3ef749b31447084839930b
 URL:		http://sourceforge.net/projects/numpy/
 BuildRequires:	lapack-devel
 BuildRequires:	python-devel
 BuildRequires:	rpm-pythonprov
 %pyrequires_eq	python-libs
+Obsoletes:	python-numpy-numarray
+Obsoletes:	python-numpy-numarray-devel
+Obsoletes:	python-numpy-oldnumeric
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -29,43 +32,6 @@ Requires:	%{name} = %{epoch}:%{version}-%{release}
 %description devel
 C header files for numerical modules.
 
-%package numarray
-Summary:	Array manipulation and computations for python
-Group:		Development/Languages/Python
-Requires:	%{name} = %{epoch}:%{version}-%{release}
-
-%description numarray
-Numarray provides array manipulation and computational capabilities
-similar to those found in IDL, Matlab, or Octave. Using numarray, it
-is possible to write many efficient numerical data processing
-applications directly in Python without using any C, C++ or Fortran
-code (as well as doing such analysis interactively within Python or
-PyRAF). For algorithms that are not well suited for efficient
-computation using array facilities it is possible to write C functions
-(and eventually Fortran) that can read and write numarray arrays that
-can be called from Python.
-
-Numarray is a re-implementation of an older Python array module called
-Numeric. In general its interface is very similar. It is mostly
-backward compatible and will be becoming more so in future releases.
-
-%package numarray-devel
-Summary:	Header files for python-numarray
-Group:		Development/Libraries
-Requires:	%{name}-devel = %{epoch}:%{version}-%{release}
-Requires:	%{name}-numarray = %{epoch}:%{version}-%{release}
-
-%description numarray-devel
-Header files for python-numarray.
-
-%package oldnumeric
-Summary:	Old numeric packages
-Group:		Libraries/Python
-Requires:	%{name} = %{epoch}:%{version}-%{release}
-
-%description oldnumeric
-Old numeric packages.
-
 %package -n f2py
 Summary:	Fortran to Python interface generator
 Group:		Libraries/Python
@@ -78,8 +44,8 @@ Fortran to Python interface generator.
 %setup -qn %{module}-%{version}
 
 %build
-CC="%{__cc}"; export CC
-CFLAGS="%{rpmcflags}"; export CFLAGS
+export CC="%{__cc}"
+export CFLAGS="%{rpmcflags}"
 %{__python} setup.py build
 
 %install
@@ -93,9 +59,7 @@ rm -rf $RPM_BUILD_ROOT
 %py_postclean
 
 %{__rm} -r $RPM_BUILD_ROOT%{py_sitedir}/%{module}/doc
-%{__rm} -r $RPM_BUILD_ROOT%{py_sitedir}/%{module}/*/{benchmarks,tests,docs}
-# already in f2py package
-%{__rm} $RPM_BUILD_ROOT%{py_sitedir}/%{module}/f2py/f2py.1
+%{__rm} -r $RPM_BUILD_ROOT%{py_sitedir}/%{module}/*/tests
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -142,21 +106,6 @@ rm -rf $RPM_BUILD_ROOT
 %{py_sitedir}/%{module}/core/include
 %{py_sitedir}/%{module}/core/lib
 %{py_sitedir}/%{module}/random/*.h
-
-%files numarray
-%defattr(644,root,root,755)
-%dir %{py_sitedir}/%{module}/numarray
-%attr(755,root,root) %{py_sitedir}/%{module}/numarray/*.so
-%{py_sitedir}/%{module}/numarray/*.py[co]
-
-%files numarray-devel
-%defattr(644,root,root,755)
-%{py_sitedir}/%{module}/numarray/include
-
-%files oldnumeric
-%defattr(644,root,root,755)
-%dir %{py_sitedir}/%{module}/oldnumeric
-%{py_sitedir}/%{module}/oldnumeric/*
 
 %files -n f2py
 %defattr(644,root,root,755)
